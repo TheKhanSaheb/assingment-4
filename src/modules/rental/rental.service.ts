@@ -104,7 +104,7 @@ const getLandlordRequests = async (landlordId: string) => {
 const updateRentalRequestStatus = async (
   rentalId: string,
   landlordId: string,
-  status: "APPROVED" | "REJECTED"
+  status: "APPROVED" | "REJECTED" | "COMPLETED"
 ) => {
   const rental = await prisma.rentalRequest.findUnique({
     where: {

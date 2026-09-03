@@ -81,12 +81,16 @@ const updateRentalRequestStatus = catchAsync(
 
     const status = req.body.status;
 
-    if (status !== "APPROVED" && status !== "REJECTED") {
-      throw new AppError(
-        400,
-        "Status must be APPROVED or REJECTED"
-      );
-    }
+    if (
+  status !== "APPROVED" &&
+  status !== "REJECTED" &&
+  status !== "COMPLETED"
+) {
+  throw new AppError(
+    400,
+    "Status must be APPROVED, REJECTED or COMPLETED"
+  );
+}
 
     const result = await rentalService.updateRentalRequestStatus(
       id,

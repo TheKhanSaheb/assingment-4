@@ -31,8 +31,20 @@ const login = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMe = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user!.id;
 
+    const result = await authService.getMe(userId);
+
+    sendResponse(res, {
+      message: "User retrieved successfully",
+      data: result,
+    });
+  }
+);
 export const authController = {
   register,
   login,
+  getMe,
 };

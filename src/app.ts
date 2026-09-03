@@ -10,6 +10,7 @@ import landlordRentalRouter from "./modules/rental/landlord-rental.routes";
 import authRouter from "./modules/auth/auth.routes";
 import paymentRouter from "./modules/payment/payment.routes";
 import reviewRouter from "./modules/review/review.routes";
+import adminRouter from "./modules/admin/admin.routes";
 
 const app: Application = express();
 
@@ -27,7 +28,7 @@ app.use("/api/landlord/requests", landlordRentalRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/payments", paymentRouter);
 app.use("/api/reviews", reviewRouter);
-
+app.use("/api/admin", adminRouter);
 // Error handlers MUST be after routes
 app.use(notFound);
 app.use(globalErrorHandler);
