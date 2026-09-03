@@ -1,0 +1,33 @@
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum PaymentMethod {
+  CARD
+  MOBILE_BANKING
+  BANK
+  OTHER
+}
+
+model Payment {
+  id              String         @id @default(uuid())
+  transactionId   String         @unique
+  rentalRequestId String
+  amount          Decimal        @db.Decimal(10, 2)
+  method          PaymentMethod
+  provider        PaymentProvider
+  status          PaymentStatus  @default(PENDING)
+  paidAt          DateTime?
+
+  rentalRequest RentalRequest @relation(fields: [rentalRequestId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

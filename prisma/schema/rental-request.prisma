@@ -1,0 +1,24 @@
+enum RentalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  COMPLETED
+}
+
+model RentalRequest {
+  id         String              @id @default(uuid())
+  tenantId   String
+  propertyId String
+  status     RentalRequestStatus @default(PENDING)
+  message    String?
+
+  tenant   User     @relation(fields: [tenantId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+
+  payments Payment[]
+  review   Review?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
