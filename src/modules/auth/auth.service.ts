@@ -107,8 +107,46 @@ const getMe = async (userId: string) => {
   return user;
 };
 
+const updateProfile = async (
+  userId: string,
+  data: {
+    name?: string;
+    email?: string;
+  }
+) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+  ...(data.name !== undefined && { name: data.name }),
+  ...(data.email !== undefined && { email: data.email }),
+},
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
 export const authService = {
   register,
   login,
    getMe,
+     updateProfile,
 };

@@ -43,8 +43,25 @@ const getMe = catchAsync(
     });
   }
 );
+
+const updateProfile = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+
+    const result = await authService.updateProfile(
+      userId,
+      req.body
+    );
+
+    sendResponse(res, {
+      message: "Profile updated successfully",
+      data: result,
+    });
+  }
+);
 export const authController = {
   register,
   login,
   getMe,
+  updateProfile,
 };
