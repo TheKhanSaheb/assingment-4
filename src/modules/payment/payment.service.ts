@@ -1,4 +1,5 @@
 import prisma from "../../lib/prisma";
+import stripe from "../../lib/stripe";
 
 const createPayment = async (
   tenantId: string,
@@ -25,22 +26,54 @@ const createPayment = async (
     throw new Error("Rental request must be approved before payment");
   }
 
+  if (data.provider !== "STRIPE") {
+    throw new Error("Only Stripe payment is currently supported");
+  }
+
   const transactionId = `TXN-${Date.now()}`;
 
-  return await prisma.payment.create({
+  const payment = await prisma.payment.create({
     data: {
       transactionId,
       rentalRequestId: data.rentalRequestId,
       amount: data.amount,
       method: data.method,
-      provider: data.provider,
+      provider: "STRIPE",
     },
   });
-};
 
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "bdt",
+          product_data: {
+            name: "RentNest Rental Payment",
+          },
+          unit_amount: Math.round(data.amount * 100),
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      paymentId: payment.id,
+      transactionId,
+      rentalRequestId: data.rentalRequestId,
+    },
+    success_url: "http://localhost:3000/payment/success",
+    cancel_url: "http://localhost:3000/payment/cancel",
+  });
+
+  return {
+    payment,
+    checkoutUrl: session.url,
+  };
+};
 const confirmPayment = async (
   tenantId: string,
-  transactionId: string
+  transactionId: string,
+  sessionId: string
 ) => {
   const payment = await prisma.payment.findUnique({
     where: { transactionId },
@@ -57,15 +90,33 @@ const confirmPayment = async (
     throw new Error("You are not allowed to confirm this payment");
   }
 
-  return await prisma.payment.update({
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (session.payment_status !== "paid") {
+    throw new Error("Payment has not been completed");
+  }
+
+  if (session.metadata?.paymentId !== payment.id) {
+    throw new Error("Invalid payment session");
+  }
+
+  const updatedPayment = await prisma.payment.update({
     where: { transactionId },
     data: {
       status: "COMPLETED",
       paidAt: new Date(),
     },
   });
-};
 
+  await prisma.rentalRequest.update({
+    where: { id: payment.rentalRequestId },
+    data: {
+      status: "ACTIVE",
+    },
+  });
+
+  return updatedPayment;
+};
 const getMyPayments = async (tenantId: string) => {
   return await prisma.payment.findMany({
     where: {

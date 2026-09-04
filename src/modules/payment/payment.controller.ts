@@ -32,9 +32,10 @@ const confirmPayment = catchAsync(
     });
 
     const result = await paymentService.confirmPayment(
-      req.user!.id,
-      data.body.transactionId
-    );
+  req.user!.id,
+  data.body.transactionId,
+  data.body.sessionId
+);
 
     sendResponse(res, {
       message: "Payment confirmed successfully",

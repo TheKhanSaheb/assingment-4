@@ -20,6 +20,7 @@ const createPayment = z.object({
 const confirmPayment = z.object({
   body: z.object({
     transactionId: z.string().min(1),
+    sessionId: z.string().min(1),
   }),
 });
 
