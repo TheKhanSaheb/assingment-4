@@ -1,3 +1,4 @@
+
 import type { Request, Response } from "express";
 
 import { authService } from "./auth.service";
@@ -31,6 +32,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getMe = catchAsync(
   async (req: Request, res: Response) => {
     const userId = req.user!.id;
@@ -48,9 +50,13 @@ const updateProfile = catchAsync(
   async (req: Request, res: Response) => {
     const userId = req.user!.id;
 
+    const data = authValidation.updateProfile.parse({
+      body: req.body,
+    });
+
     const result = await authService.updateProfile(
       userId,
-      req.body
+      data.body
     );
 
     sendResponse(res, {
@@ -59,9 +65,11 @@ const updateProfile = catchAsync(
     });
   }
 );
+
 export const authController = {
   register,
   login,
   getMe,
   updateProfile,
 };
+

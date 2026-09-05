@@ -109,10 +109,10 @@ const getMe = async (userId: string) => {
 
 const updateProfile = async (
   userId: string,
-  data: {
-    name?: string;
-    email?: string;
-  }
+ data: {
+  name?: string | undefined;
+  email?: string | undefined;
+}
 ) => {
   const user = await prisma.user.findUnique({
     where: {
