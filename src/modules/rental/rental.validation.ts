@@ -7,6 +7,16 @@ const createRentalRequest = z.object({
   }),
 });
 
+const updateRentalRequestStatus = z.object({
+  params: z.object({
+    id: z.string().uuid(),
+  }),
+  body: z.object({
+    status: z.enum(["APPROVED", "REJECTED", "COMPLETED"]),
+  }),
+});
+
 export const rentalValidation = {
   createRentalRequest,
+  updateRentalRequestStatus,
 };

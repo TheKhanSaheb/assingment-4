@@ -1,7 +1,9 @@
 import { Router, type IRouter } from "express";
 
 import auth from "../../middleware/auth";
+import validateRequest from "../../middleware/validate-request";
 import { adminController } from "./admin.controller";
+import { adminValidation } from "./admin.validation";
 
 const adminRouter: IRouter = Router();
 
@@ -14,6 +16,7 @@ adminRouter.get(
 adminRouter.patch(
   "/users/:id",
   auth("ADMIN"),
+  validateRequest(adminValidation.updateUserStatus),
   adminController.updateUserStatus
 );
 
