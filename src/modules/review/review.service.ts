@@ -2,12 +2,12 @@ import prisma from "../../lib/prisma";
 
 const createReview = async (
   tenantId: string,
-  data: {
-    propertyId: string;
-    rentalRequestId: string;
-    rating: number;
-    comment?: string;
-  }
+ data: {
+  propertyId: string;
+  rentalRequestId: string;
+  rating: number;
+  comment?: string | undefined;
+}
 ) => {
   const rental = await prisma.rentalRequest.findUnique({
     where: {

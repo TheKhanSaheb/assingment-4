@@ -1,19 +1,30 @@
 import type { Request, Response } from "express";
+
 import { reviewService } from "./review.service";
+import { reviewValidation } from "./review.validation";
 
-const createReview = async (req: Request, res: Response) => {
-  const tenantId = req.user!.id;
+import { catchAsync } from "../../utils/catch-async";
+import { sendResponse } from "../../utils/send-response";
 
-  const result = await reviewService.createReview(
-    tenantId,
-    req.body
-  );
+const createReview = catchAsync(
+  async (req: Request, res: Response) => {
+    const data = reviewValidation.createReview.parse({
+      body: req.body,
+    });
 
-  res.status(201).json({
-    message: "Review created successfully",
-    data: result,
-  });
-};
+    const tenantId = req.user!.id;
+
+    const result = await reviewService.createReview(
+      tenantId,
+      data.body
+    );
+
+    sendResponse(res, {
+      message: "Review created successfully",
+      data: result,
+    });
+  }
+);
 
 export const reviewController = {
   createReview,
